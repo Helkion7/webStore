@@ -3,20 +3,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const createJWT = require("../utils/createJWT");
 const createCookie = require("../utils/createCookie.js");
-const { generateNorwegianBankAccount } = require("../utils/bankAccountUtil.js");
 
 // Number of salt rounds for password hashing
 const saltRounds = parseInt(process.env.SALT);
 
 const authController = {
-  /**
-   * 1. Validate email and password presence
-   * 2. Validate email format
-   * 3. Find user by email and check if exists
-   * 4. Compare passwords
-   * 5. Generate JWT token and set cookie
-   * 6. Send success response
-   */
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -74,16 +65,6 @@ const authController = {
     }
   },
 
-  /**
-   * 1. Validate all required fields
-   * 2. Validate email format
-   * 3. Check password requirements
-   * 4. Verify password matching
-   * 5. Check if email already exists
-   * 6. Hash password
-   * 7. Generate bank account details
-   * 8. Create and save new user
-   */
   register: async (req, res) => {
     try {
       const { name, email, password, repeatPassword } = req.body;
@@ -128,17 +109,12 @@ const authController = {
       // Hash password
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      // Generate bank account details for new user
-      const bankAccount = generateNorwegianBankAccount();
-
       // Create new user with all details
       const user = new User({
         name,
         email,
         password: hashedPassword,
         role: "user",
-        bankAccountNumber: bankAccount.accountNumber,
-        iban: bankAccount.iban,
       });
 
       // Save user to database
@@ -158,6 +134,29 @@ const authController = {
       }
       return res.status(500).json({
         msg: "Error during registration",
+        error: error.message,
+      });
+    }
+  },
+
+  logout: async (req, res) => {
+    try {
+      // Clear the JWT cookie by setting an expired date
+      res.cookie("jwt", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: true,
+        expires: new Date(0), // Set expiration to epoch time (1970-01-01), effectively removing the cookie
+      });
+
+      return res.status(200).json({
+        msg: "Logout successful",
+        success: true,
+      });
+    } catch (error) {
+      console.error("Error in logout:", error);
+      return res.status(500).json({
+        msg: "Error during logout",
         error: error.message,
       });
     }

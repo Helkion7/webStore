@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User, LogOut } from "lucide-react";
 import axios from "axios";
 
 const Register = () => {
@@ -27,6 +27,21 @@ const Register = () => {
       }
     } catch (error) {
       setMsg(error.response?.data?.msg || "Register failed");
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`,
+        {},
+        { withCredentials: true, timeout: 5000 }
+      );
+      setMsg(response.data.msg);
+      // Optionally refresh the page or redirect to home after logout
+      setTimeout(() => navigate("/"), 2000);
+    } catch (error) {
+      setMsg(error.response?.data?.msg || "Logout failed");
     }
   }
 
@@ -85,6 +100,16 @@ const Register = () => {
       <button onClick={() => navigate("/login")}>
         Har allerede en konto? Logg Inn
       </button>
+
+      <div style={{ marginTop: "20px" }}>
+        <button
+          onClick={handleLogout}
+          style={{ display: "flex", alignItems: "center", gap: "5px" }}
+        >
+          <LogOut size={18} />
+          Logg Ut
+        </button>
+      </div>
     </div>
   );
 };
