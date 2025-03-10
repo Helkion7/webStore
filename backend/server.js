@@ -8,6 +8,7 @@ const helmet = require("helmet");
 
 // Import route modules
 const authRoutes = require("./routes/authRoutes");
+const productRoutes = require("./routes/productRoutes");
 
 // Initialize Express app
 const app = express();
@@ -51,7 +52,9 @@ app.use(express.json());
 // Parse cookies
 app.use(cookieParser());
 
+// Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
 
 app.get("/", (req, res) => {
   res.send(`Server running on port ${process.env.PORT}`);
