@@ -101,7 +101,7 @@ const CreateProduct = () => {
 
   // Preview image
   const imagePreview = imageUrl ? (
-    <div className="mt-2 border rounded-md overflow-hidden">
+    <div className="mt-4 border border-purple-700 rounded-md overflow-hidden">
       <img
         src={imageUrl}
         alt="Forhåndsvisning"
@@ -117,9 +117,9 @@ const CreateProduct = () => {
 
   if (!isAdmin) {
     return (
-      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-        <div className="flex items-center gap-2 bg-red-100 text-red-800 p-3 rounded-md">
-          <AlertCircle size={18} />
+      <div className="max-w-md mx-auto p-6 bg-[#2D2D2D] rounded-lg shadow-lg border border-[#8A2BE2] text-[#E0E0E0]">
+        <div className="flex items-center gap-2 bg-[#8B0000] bg-opacity-20 text-[#E0E0E0] p-4 rounded-md border border-[#8B0000]">
+          <AlertCircle size={18} className="text-[#8B0000]" />
           <p>{error || "Sjekker admin-status..."}</p>
         </div>
       </div>
@@ -127,104 +127,120 @@ const CreateProduct = () => {
   }
 
   return (
-    <div>
-      {!isAdmin ? (
-        <div>
-          <div>
-            <AlertCircle size={18} />
-            <p>{error || "Sjekker admin-status..."}</p>
-          </div>
+    <div className="max-w-3xl mx-auto py-8 px-4">
+      <div className="bg-[#2D2D2D] rounded-lg shadow-lg border border-[#8A2BE2] p-6 text-[#E0E0E0]">
+        <div className="flex justify-between items-center mb-8 border-b border-[#663399] pb-4">
+          <h1 className="text-3xl font-bold text-[#9370DB] tracking-wide">
+            Opprett Nytt Produkt
+          </h1>
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 px-4 py-2 bg-[#333333] hover:bg-[#444444] rounded-md transition-all duration-300 border border-[#8A2BE2] hover:shadow-[0_0_8px_rgba(138,43,226,0.6)]"
+          >
+            <ChevronLeft size={16} className="text-[#9370DB]" />
+            <span>Tilbake</span>
+          </button>
         </div>
-      ) : (
-        <div>
-          <div>
-            <h1>Opprett Nytt Produkt</h1>
-            <button onClick={() => navigate("/")}>
-              <ChevronLeft size={16} />
-              <span>Tilbake</span>
-            </button>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9370DB]">
+              <Type size={18} />
+            </div>
+            <input
+              type="text"
+              placeholder="Tittel"
+              value={title}
+              required
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full py-3 px-10 bg-[#1E1E1E] rounded-md border border-[#444444] focus:border-[#9370DB] focus:shadow-[0_0_0_2px_rgba(138,43,226,0.3)] outline-none transition-all duration-200"
+            />
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div>
-              <Type />
-              <input
-                type="text"
-                placeholder="Tittel"
-                value={title}
+          <div>
+            <div className="relative">
+              <div className="absolute left-3 top-3 text-[#9370DB]">
+                <Tag size={18} />
+              </div>
+              <textarea
+                placeholder="Beskrivelse (maks 100 tegn)"
+                value={description}
                 required
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => setDescription(e.target.value)}
+                maxLength={maxLength}
+                className="w-full py-3 px-10 bg-[#1E1E1E] rounded-md border border-[#444444] focus:border-[#9370DB] focus:shadow-[0_0_0_2px_rgba(138,43,226,0.3)] outline-none transition-all duration-200 min-h-[100px] resize-y"
               />
             </div>
-
-            <div>
-              <div>
-                <Tag />
-                <textarea
-                  placeholder="Beskrivelse (maks 100 tegn)"
-                  value={description}
-                  required
-                  onChange={(e) => setDescription(e.target.value)}
-                  maxLength={maxLength}
-                />
-              </div>
-              <div>
-                {descriptionLength}/{maxLength} tegn
-              </div>
+            <div className="flex justify-end mt-2 text-sm text-[#C0C0C0]">
+              {descriptionLength}/{maxLength} tegn
             </div>
+          </div>
 
-            <div>
-              <div>
-                <Image />
-                <input
-                  type="url"
-                  placeholder="Bilde URL"
-                  value={imageUrl}
-                  required
-                  onChange={(e) => setImageUrl(e.target.value)}
-                />
+          <div>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9370DB]">
+                <Image size={18} />
               </div>
-              {imagePreview}
-            </div>
-
-            <div>
-              <Tag />
-              <select
-                value={category}
+              <input
+                type="url"
+                placeholder="Bilde URL"
+                value={imageUrl}
                 required
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <option value="">Velg kategori</option>
-                <option value="genser">Genser</option>
-                <option value="tskjorte">T-skjorte</option>
-              </select>
+                onChange={(e) => setImageUrl(e.target.value)}
+                className="w-full py-3 px-10 bg-[#1E1E1E] rounded-md border border-[#444444] focus:border-[#9370DB] focus:shadow-[0_0_0_2px_rgba(138,43,226,0.3)] outline-none transition-all duration-200"
+              />
             </div>
+            {imagePreview}
+          </div>
 
-            <button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <div></div>
-                  Lagrer...
-                </>
-              ) : (
-                <>
-                  <Save size={18} />
-                  Lagre Produkt
-                </>
-              )}
-            </button>
-          </form>
-
-          {error && (
-            <div>
-              <AlertCircle size={18} />
-              {error}
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9370DB]">
+              <Tag size={18} />
             </div>
-          )}
+            <select
+              value={category}
+              required
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full appearance-none py-3 px-10 bg-[#1E1E1E] rounded-md border border-[#444444] focus:border-[#9370DB] focus:shadow-[0_0_0_2px_rgba(138,43,226,0.3)] outline-none transition-all duration-200"
+            >
+              <option value="">Velg kategori</option>
+              <option value="genser">Genser</option>
+              <option value="tskjorte">T-skjorte</option>
+            </select>
+          </div>
 
-          {msg && <div>{msg}</div>}
-        </div>
-      )}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-[#663399] to-[#8A2BE2] rounded-md font-semibold hover:from-[#8A2BE2] hover:to-[#9370DB] transition-all duration-300 hover:shadow-[0_0_12px_rgba(138,43,226,0.8)] disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin w-5 h-5 border-2 border-[#E0E0E0] border-t-transparent rounded-full"></div>
+                <span>Lagrer...</span>
+              </>
+            ) : (
+              <>
+                <Save size={18} />
+                <span>Lagre Produkt</span>
+              </>
+            )}
+          </button>
+        </form>
+
+        {error && (
+          <div className="mt-6 flex items-center gap-2 bg-[#8B0000] bg-opacity-20 text-[#E0E0E0] p-4 rounded-md border border-[#8B0000]">
+            <AlertCircle size={18} className="text-[#8B0000]" />
+            <p>{error}</p>
+          </div>
+        )}
+
+        {msg && (
+          <div className="mt-6 flex items-center gap-2 bg-[#663399] bg-opacity-20 text-[#E0E0E0] p-4 rounded-md border border-[#663399]">
+            <p>{msg}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

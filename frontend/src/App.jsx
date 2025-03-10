@@ -12,9 +12,9 @@ import AdminPanel from "./pages/AdminPanel";
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#1E1E1E] text-[#E0E0E0]">
       <NavBar />
-      <main className="py-6">
+      <main className="container mx-auto px-4 py-6">
         <Routes>
           {/* Existing routes */}
           <Route path="/" element={<LandingPage />} />
@@ -39,7 +39,9 @@ function App() {
           <Route
             path="*"
             element={
-              <h1 className="text-center text-2xl mt-10">404 Not Found</h1>
+              <h1 className="text-center text-2xl mt-10 font-bold">
+                404 Not Found
+              </h1>
             }
           />
         </Routes>

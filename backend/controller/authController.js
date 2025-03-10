@@ -53,7 +53,7 @@ const authController = {
       delete userResponse.password;
 
       return res.status(201).json({
-        msg: "Login successful. Redirecting to Account...",
+        msg: "Login successful. Redirecting to Landing Page...",
         success: true,
       });
     } catch (error) {
