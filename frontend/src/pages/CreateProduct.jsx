@@ -127,116 +127,102 @@ const CreateProduct = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Opprett Nytt Produkt
-        </h1>
-        <button
-          onClick={() => navigate("/")}
-          className="text-blue-600 hover:text-blue-800 flex items-center"
-        >
-          <ChevronLeft size={16} />
-          <span>Tilbake</span>
-        </button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-          <Type className="text-gray-500 mr-2" size={18} />
-          <input
-            type="text"
-            placeholder="Tittel"
-            value={title}
-            required
-            className="flex-1 outline-none bg-transparent"
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-
-        <div className="relative border border-gray-300 rounded-md px-3 py-2">
-          <div className="flex items-start">
-            <Tag className="text-gray-500 mr-2 mt-2" size={18} />
-            <textarea
-              placeholder="Beskrivelse (maks 100 tegn)"
-              value={description}
-              required
-              className="flex-1 outline-none bg-transparent min-h-[80px] resize-y"
-              onChange={(e) => setDescription(e.target.value)}
-              maxLength={maxLength}
-            />
-          </div>
-          <div
-            className={`text-xs absolute bottom-2 right-3 ${
-              descriptionLength > maxLength
-                ? "text-red-500 font-semibold"
-                : "text-gray-500"
-            }`}
-          >
-            {descriptionLength}/{maxLength} tegn
-          </div>
-        </div>
-
+    <div>
+      {!isAdmin ? (
         <div>
-          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-            <Image className="text-gray-500 mr-2" size={18} />
-            <input
-              type="url"
-              placeholder="Bilde URL"
-              value={imageUrl}
-              required
-              className="flex-1 outline-none bg-transparent"
-              onChange={(e) => setImageUrl(e.target.value)}
-            />
+          <div>
+            <AlertCircle size={18} />
+            <p>{error || "Sjekker admin-status..."}</p>
           </div>
-          {imagePreview}
         </div>
+      ) : (
+        <div>
+          <div>
+            <h1>Opprett Nytt Produkt</h1>
+            <button onClick={() => navigate("/")}>
+              <ChevronLeft size={16} />
+              <span>Tilbake</span>
+            </button>
+          </div>
 
-        <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-          <Tag className="text-gray-500 mr-2" size={18} />
-          <select
-            value={category}
-            required
-            className="flex-1 outline-none bg-transparent py-1"
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="">Velg kategori</option>
-            <option value="genser">Genser</option>
-            <option value="tskjorte">T-skjorte</option>
-          </select>
-        </div>
+          <form onSubmit={handleSubmit}>
+            <div>
+              <Type />
+              <input
+                type="text"
+                placeholder="Tittel"
+                value={title}
+                required
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className={`w-full flex justify-center items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-md transition duration-200 ${
-            isLoading ? "opacity-70 cursor-not-allowed" : ""
-          }`}
-        >
-          {isLoading ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Lagrer...
-            </>
-          ) : (
-            <>
-              <Save size={18} />
-              Lagre Produkt
-            </>
+            <div>
+              <div>
+                <Tag />
+                <textarea
+                  placeholder="Beskrivelse (maks 100 tegn)"
+                  value={description}
+                  required
+                  onChange={(e) => setDescription(e.target.value)}
+                  maxLength={maxLength}
+                />
+              </div>
+              <div>
+                {descriptionLength}/{maxLength} tegn
+              </div>
+            </div>
+
+            <div>
+              <div>
+                <Image />
+                <input
+                  type="url"
+                  placeholder="Bilde URL"
+                  value={imageUrl}
+                  required
+                  onChange={(e) => setImageUrl(e.target.value)}
+                />
+              </div>
+              {imagePreview}
+            </div>
+
+            <div>
+              <Tag />
+              <select
+                value={category}
+                required
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="">Velg kategori</option>
+                <option value="genser">Genser</option>
+                <option value="tskjorte">T-skjorte</option>
+              </select>
+            </div>
+
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <div></div>
+                  Lagrer...
+                </>
+              ) : (
+                <>
+                  <Save size={18} />
+                  Lagre Produkt
+                </>
+              )}
+            </button>
+          </form>
+
+          {error && (
+            <div>
+              <AlertCircle size={18} />
+              {error}
+            </div>
           )}
-        </button>
-      </form>
 
-      {error && (
-        <div className="mt-4 flex items-center gap-2 bg-red-100 text-red-800 p-3 rounded-md">
-          <AlertCircle size={18} />
-          {error}
-        </div>
-      )}
-
-      {msg && (
-        <div className="mt-4 bg-green-100 text-green-800 p-3 rounded-md text-center">
-          {msg}
+          {msg && <div>{msg}</div>}
         </div>
       )}
     </div>

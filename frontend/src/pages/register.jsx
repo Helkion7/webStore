@@ -101,11 +101,8 @@ const Register = () => {
         Har allerede en konto? Logg Inn
       </button>
 
-      <div style={{ marginTop: "20px" }}>
-        <button
-          onClick={handleLogout}
-          style={{ display: "flex", alignItems: "center", gap: "5px" }}
-        >
+      <div>
+        <button onClick={handleLogout}>
           <LogOut size={18} />
           Logg Ut
         </button>

@@ -44,12 +44,6 @@ function App() {
           />
         </Routes>
       </main>
-      <footer className="py-6 text-center text-gray-600">
-        <p>
-          &copy; {new Date().getFullYear()} RockWear. Alle rettigheter
-          reservert.
-        </p>
-      </footer>
     </div>
   );
 }

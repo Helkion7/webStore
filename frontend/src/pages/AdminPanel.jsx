@@ -80,61 +80,61 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Admin Panel</h1>
-
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-          <Shield className="mr-2" size={20} />
-          Forfrem bruker til admin
-        </h2>
-        <form onSubmit={handlePromoteUser} className="space-y-4">
-          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-            <Users className="text-gray-500 mr-2" size={18} />
-            <input
-              type="email"
-              placeholder="Brukerens e-post"
-              value={promotionEmail}
-              required
-              className="flex-1 outline-none bg-transparent"
-              onChange={(e) => setPromotionEmail(e.target.value)}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full flex justify-center items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-md transition duration-200 ${
-              isLoading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                Forfremmer...
-              </>
-            ) : (
-              <>
-                <Shield size={18} />
-                Forfrem til Admin
-              </>
-            )}
-          </button>
-        </form>
-
-        {error && (
-          <div className="mt-4 flex items-center gap-2 bg-red-100 text-red-800 p-3 rounded-md">
+    <div>
+      {!isAdmin ? (
+        <div>
+          <div>
             <AlertCircle size={18} />
-            {error}
+            <p>{error || "Sjekker admin-status..."}</p>
           </div>
-        )}
+        </div>
+      ) : (
+        <div>
+          <h1>Admin Panel</h1>
 
-        {msg && (
-          <div className="mt-4 bg-green-100 text-green-800 p-3 rounded-md text-center">
-            {msg}
+          <div>
+            <h2>
+              <Shield className="mr-2" size={20} />
+              Forfrem bruker til admin
+            </h2>
+            <form onSubmit={handlePromoteUser}>
+              <div>
+                <Users />
+                <input
+                  type="email"
+                  placeholder="Brukerens e-post"
+                  value={promotionEmail}
+                  required
+                  onChange={(e) => setPromotionEmail(e.target.value)}
+                />
+              </div>
+
+              <button type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <div></div>
+                    Forfremmer...
+                  </>
+                ) : (
+                  <>
+                    <Shield size={18} />
+                    Forfrem til Admin
+                  </>
+                )}
+              </button>
+            </form>
+
+            {error && (
+              <div>
+                <AlertCircle size={18} />
+                {error}
+              </div>
+            )}
+
+            {msg && <div>{msg}</div>}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
