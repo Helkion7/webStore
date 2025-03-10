@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tag, Type, Image, ListFilter, Save, AlertCircle } from "lucide-react";
+import { Tag, Type, Image, Save, AlertCircle, ChevronLeft } from "lucide-react";
 import axios from "axios";
 
 const CreateProduct = () => {
@@ -10,11 +10,39 @@ const CreateProduct = () => {
   const [category, setCategory] = useState("");
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   // Character count for description
   const descriptionLength = description.length;
   const maxLength = 100;
+
+  useEffect(() => {
+    // Check if user is logged in and is admin
+    const checkAdmin = async () => {
+      try {
+        // Normally you'd have an endpoint to check user status
+        // For now, we'll assume you have an endpoint that returns user info
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
+          { withCredentials: true }
+        );
+
+        if (response.data.user && response.data.user.role === "admin") {
+          setIsAdmin(true);
+        } else {
+          setError("Du må være logget inn som admin for å legge til produkter");
+          setTimeout(() => navigate("/"), 3000);
+        }
+      } catch (error) {
+        setError("Du må være logget inn som admin for å legge til produkter");
+        setTimeout(() => navigate("/"), 3000);
+      }
+    };
+
+    checkAdmin();
+  }, [navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -29,11 +57,13 @@ const CreateProduct = () => {
       return;
     }
 
-    // Validate category
-    if (!["genser", "tskjorte"].includes(category.toLowerCase())) {
-      setError("Kategori må være enten 'genser' eller 'tskjorte'");
+    // Validate all fields
+    if (!title || !description || !imageUrl || !category) {
+      setError("Alle feltene må fylles ut");
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const response = await axios.post(
@@ -46,11 +76,11 @@ const CreateProduct = () => {
         },
         {
           withCredentials: true,
-          timeout: 5000,
         }
       );
 
-      setMsg(response.data.msg);
+      setIsLoading(false);
+      setMsg(response.data.msg || "Produkt opprettet");
 
       if (response.data.success) {
         // Clear form after successful creation
@@ -59,27 +89,64 @@ const CreateProduct = () => {
         setImageUrl("");
         setCategory("");
 
-        // Navigate to products page or stay on the same page
-        setTimeout(() => navigate("/products"), 2000);
+        // Navigate to products page after delay
+        setTimeout(() => navigate("/"), 2000);
       }
     } catch (error) {
+      setIsLoading(false);
       setError(error.response?.data?.msg || "Kunne ikke opprette produkt");
       console.error("Error creating product:", error);
     }
   }
 
+  // Preview image
+  const imagePreview = imageUrl ? (
+    <div className="mt-2 border rounded-md overflow-hidden">
+      <img
+        src={imageUrl}
+        alt="Forhåndsvisning"
+        className="w-full h-40 object-cover"
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src =
+            "https://via.placeholder.com/300x150?text=Ugyldig+bildeadresse";
+        }}
+      />
+    </div>
+  ) : null;
+
+  if (!isAdmin) {
+    return (
+      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+        <div className="flex items-center gap-2 bg-red-100 text-red-800 p-3 rounded-md">
+          <AlertCircle size={18} />
+          <p>{error || "Sjekker admin-status..."}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
-        Opprett Nytt Produkt
-      </h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Opprett Nytt Produkt
+        </h1>
+        <button
+          onClick={() => navigate("/")}
+          className="text-blue-600 hover:text-blue-800 flex items-center"
+        >
+          <ChevronLeft size={16} />
+          <span>Tilbake</span>
+        </button>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
           <Type className="text-gray-500 mr-2" size={18} />
           <input
             type="text"
-            placeholder="Produkttittel"
+            placeholder="Tittel"
             value={title}
             required
             className="flex-1 outline-none bg-transparent"
@@ -91,10 +158,10 @@ const CreateProduct = () => {
           <div className="flex items-start">
             <Tag className="text-gray-500 mr-2 mt-2" size={18} />
             <textarea
-              placeholder="Produktbeskrivelse (maks 100 tegn)"
+              placeholder="Beskrivelse (maks 100 tegn)"
               value={description}
               required
-              className="flex-1 outline-none bg-transparent min-h-[80px]"
+              className="flex-1 outline-none bg-transparent min-h-[80px] resize-y"
               onChange={(e) => setDescription(e.target.value)}
               maxLength={maxLength}
             />
@@ -110,24 +177,27 @@ const CreateProduct = () => {
           </div>
         </div>
 
-        <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-          <Image className="text-gray-500 mr-2" size={18} />
-          <input
-            type="url"
-            placeholder="Bilde URL"
-            value={imageUrl}
-            required
-            className="flex-1 outline-none bg-transparent"
-            onChange={(e) => setImageUrl(e.target.value)}
-          />
+        <div>
+          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
+            <Image className="text-gray-500 mr-2" size={18} />
+            <input
+              type="url"
+              placeholder="Bilde URL"
+              value={imageUrl}
+              required
+              className="flex-1 outline-none bg-transparent"
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
+          </div>
+          {imagePreview}
         </div>
 
         <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-          <ListFilter className="text-gray-500 mr-2" size={18} />
+          <Tag className="text-gray-500 mr-2" size={18} />
           <select
             value={category}
             required
-            className="flex-1 outline-none bg-transparent"
+            className="flex-1 outline-none bg-transparent py-1"
             onChange={(e) => setCategory(e.target.value)}
           >
             <option value="">Velg kategori</option>
@@ -138,10 +208,22 @@ const CreateProduct = () => {
 
         <button
           type="submit"
-          className="w-full flex justify-center items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-md transition duration-200"
+          disabled={isLoading}
+          className={`w-full flex justify-center items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-md transition duration-200 ${
+            isLoading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
         >
-          <Save size={18} />
-          Lagre Produkt
+          {isLoading ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              Lagrer...
+            </>
+          ) : (
+            <>
+              <Save size={18} />
+              Lagre Produkt
+            </>
+          )}
         </button>
       </form>
 
@@ -157,13 +239,6 @@ const CreateProduct = () => {
           {msg}
         </div>
       )}
-
-      <button
-        onClick={() => navigate("/products")}
-        className="w-full mt-4 py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md transition duration-200"
-      >
-        Tilbake til produkter
-      </button>
     </div>
   );
 };

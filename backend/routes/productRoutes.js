@@ -10,6 +10,16 @@ router.post("/", apiLimiter, verifyJwt, productController.createProduct);
 // Get all products - Public route with rate limiting
 router.get("/", apiLimiter, productController.getAllProducts);
 
+// Get newest products - Public route with rate limiting
+router.get("/newest", apiLimiter, productController.getNewestProducts);
+
+// Get products by category - Public route with rate limiting
+router.get(
+  "/category/:category",
+  apiLimiter,
+  productController.getProductsByCategory
+);
+
 // Get product by ID - Public route with rate limiting
 router.get("/:id", apiLimiter, productController.getProductById);
 

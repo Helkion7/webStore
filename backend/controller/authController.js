@@ -160,6 +160,87 @@ const authController = {
       });
     }
   },
+
+  // New method to promote a user to admin
+  promoteToAdmin: async (req, res) => {
+    try {
+      // Check if the requester is an admin
+      if (req.user.role !== "admin") {
+        return res.status(403).json({
+          msg: "Unauthorized. Only admin users can promote other users",
+        });
+      }
+
+      const { email } = req.body;
+
+      // Validate email presence
+      if (!email) {
+        return res.status(400).json({
+          msg: "Email is required",
+        });
+      }
+
+      // Find user to promote
+      const userToPromote = await User.findOne({ email });
+      if (!userToPromote) {
+        return res.status(404).json({
+          msg: "User not found",
+        });
+      }
+
+      // Check if user is already an admin
+      if (userToPromote.role === "admin") {
+        return res.status(400).json({
+          msg: "User is already an admin",
+        });
+      }
+
+      // Update user role to admin
+      userToPromote.role = "admin";
+      await userToPromote.save();
+
+      return res.status(200).json({
+        msg: "User promoted to admin successfully",
+        success: true,
+      });
+    } catch (error) {
+      console.error("Error in promoteToAdmin:", error);
+      return res.status(500).json({
+        msg: "Error during user promotion",
+        error: error.message,
+      });
+    }
+  },
+
+  // New method to get user information
+  getUserInfo: async (req, res) => {
+    try {
+      // The user object is already attached from the verifyJwt middleware
+      const user = await User.findOne({ email: req.user.email });
+
+      if (!user) {
+        return res.status(404).json({
+          msg: "User not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        user: {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          id: user._id,
+        },
+      });
+    } catch (error) {
+      console.error("Error in getUserInfo:", error);
+      return res.status(500).json({
+        msg: "Error fetching user information",
+        error: error.message,
+      });
+    }
+  },
 };
 
 module.exports = authController;
