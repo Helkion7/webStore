@@ -1,8 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import LandingPage from "./pages/LandingPage";
 import Login from "./pages/login";
 import Register from "./pages/register";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   return (

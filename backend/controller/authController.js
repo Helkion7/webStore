@@ -141,12 +141,11 @@ const authController = {
 
   logout: async (req, res) => {
     try {
-      // Clear the JWT cookie by setting an expired date
       res.cookie("jwt", "", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: true,
-        expires: new Date(0), // Set expiration to epoch time (1970-01-01), effectively removing the cookie
+        expires: new Date(0),
       });
 
       return res.status(200).json({
