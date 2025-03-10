@@ -13,6 +13,9 @@ router.get("/", apiLimiter, productController.getAllProducts);
 // Get newest products - Public route with rate limiting
 router.get("/newest", apiLimiter, productController.getNewestProducts);
 
+// Get featured products - Public route with rate limiting
+router.get("/featured", apiLimiter, productController.getFeaturedProducts);
+
 // Get products by category - Public route with rate limiting
 router.get(
   "/category/:category",
@@ -22,5 +25,13 @@ router.get(
 
 // Get product by ID - Public route with rate limiting
 router.get("/:id", apiLimiter, productController.getProductById);
+
+// Update product stock - Admin only with JWT verification
+router.patch(
+  "/:id/stock",
+  apiLimiter,
+  verifyJwt,
+  productController.updateStock
+);
 
 module.exports = router;
