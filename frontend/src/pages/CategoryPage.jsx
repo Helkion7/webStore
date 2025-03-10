@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
-const CategoryPage = () => {
-  const { category } = useParams();
+const CategoryPage = ({ category }) => {
+  // Get category from props instead of useParams
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -12,6 +12,12 @@ const CategoryPage = () => {
 
   useEffect(() => {
     const fetchProductsByCategory = async () => {
+      if (!category) {
+        setError("Kategori mangler");
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         const response = await axios.get(
@@ -32,6 +38,7 @@ const CategoryPage = () => {
     fetchProductsByCategory();
   }, [category]);
 
+  // Rest of your component remains the same
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6">
       <div className="flex justify-between items-center mb-6">
