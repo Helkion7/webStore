@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tag, Type, Image, Save, AlertCircle, ChevronLeft } from "lucide-react";
+import {
+  Tag,
+  Type,
+  Image,
+  Save,
+  AlertCircle,
+  ChevronLeft,
+  DollarSign,
+  Package,
+} from "lucide-react";
 import axios from "axios";
 
 const CreateProduct = () => {
@@ -8,6 +17,20 @@ const CreateProduct = () => {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [category, setCategory] = useState("");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
+  const [sizes, setSizes] = useState([
+    { name: "S", selected: false },
+    { name: "M", selected: false },
+    { name: "L", selected: false },
+    { name: "XL", selected: false },
+  ]);
+  const [colors, setColors] = useState([
+    { name: "Black", selected: false },
+    { name: "White", selected: false },
+    { name: "Blue", selected: false },
+    { name: "Red", selected: false },
+  ]);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -58,10 +81,18 @@ const CreateProduct = () => {
     }
 
     // Validate all fields
-    if (!title || !description || !imageUrl || !category) {
-      setError("Alle feltene må fylles ut");
+    if (!title || !description || !imageUrl || !category || !price || !stock) {
+      setError("Alle påkrevde feltene må fylles ut");
       return;
     }
+
+    // Get selected sizes and colors
+    const selectedSizes = sizes
+      .filter((size) => size.selected)
+      .map((size) => size.name);
+    const selectedColors = colors
+      .filter((color) => color.selected)
+      .map((color) => color.name);
 
     setIsLoading(true);
 
@@ -73,6 +104,10 @@ const CreateProduct = () => {
           description,
           imageUrl,
           category: category.toLowerCase(),
+          price: Number(price),
+          stock: Number(stock),
+          sizes: selectedSizes,
+          colors: selectedColors,
         },
         {
           withCredentials: true,
@@ -88,6 +123,10 @@ const CreateProduct = () => {
         setDescription("");
         setImageUrl("");
         setCategory("");
+        setPrice("");
+        setStock("");
+        setSizes(sizes.map((size) => ({ ...size, selected: false })));
+        setColors(colors.map((color) => ({ ...color, selected: false })));
 
         // Navigate to products page after delay
         setTimeout(() => navigate("/"), 2000);
@@ -125,6 +164,20 @@ const CreateProduct = () => {
       </div>
     );
   }
+
+  // Handle size selection
+  const handleSizeToggle = (index) => {
+    const updatedSizes = [...sizes];
+    updatedSizes[index].selected = !updatedSizes[index].selected;
+    setSizes(updatedSizes);
+  };
+
+  // Handle color selection
+  const handleColorToggle = (index) => {
+    const updatedColors = [...colors];
+    updatedColors[index].selected = !updatedColors[index].selected;
+    setColors(updatedColors);
+  };
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
@@ -176,6 +229,40 @@ const CreateProduct = () => {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9370DB]">
+                <DollarSign size={18} />
+              </div>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Pris"
+                value={price}
+                required
+                onChange={(e) => setPrice(e.target.value)}
+                className="w-full py-3 px-10 bg-[#1E1E1E] rounded-md border border-[#444444] focus:border-[#9370DB] focus:shadow-[0_0_0_2px_rgba(138,43,226,0.3)] outline-none transition-all duration-200"
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9370DB]">
+                <Package size={18} />
+              </div>
+              <input
+                type="number"
+                step="1"
+                min="0"
+                placeholder="Lagerbeholdning"
+                value={stock}
+                required
+                onChange={(e) => setStock(e.target.value)}
+                className="w-full py-3 px-10 bg-[#1E1E1E] rounded-md border border-[#444444] focus:border-[#9370DB] focus:shadow-[0_0_0_2px_rgba(138,43,226,0.3)] outline-none transition-all duration-200"
+              />
+            </div>
+          </div>
+
           <div>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9370DB]">
@@ -207,6 +294,56 @@ const CreateProduct = () => {
               <option value="genser">Genser</option>
               <option value="tskjorte">T-skjorte</option>
             </select>
+          </div>
+
+          {/* Sizes section */}
+          <div className="border border-[#444444] rounded-md p-4 bg-[#252525]">
+            <h3 className="text-[#9370DB] font-bold mb-3">Størrelser</h3>
+            <div className="flex flex-wrap gap-3">
+              {sizes.map((size, index) => (
+                <label
+                  key={size.name}
+                  className={`flex items-center justify-center w-14 h-10 rounded-md cursor-pointer transition-all duration-200 ${
+                    size.selected
+                      ? "bg-[#663399] text-white border-2 border-[#8A2BE2] shadow-[0_0_10px_rgba(138,43,226,0.5)]"
+                      : "bg-[#333333] text-[#C0C0C0] border border-[#444444] hover:bg-[#444444]"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={size.selected}
+                    onChange={() => handleSizeToggle(index)}
+                    className="hidden"
+                  />
+                  {size.name}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Colors section */}
+          <div className="border border-[#444444] rounded-md p-4 bg-[#252525]">
+            <h3 className="text-[#9370DB] font-bold mb-3">Farger</h3>
+            <div className="flex flex-wrap gap-3">
+              {colors.map((color, index) => (
+                <label
+                  key={color.name}
+                  className={`flex items-center justify-center px-4 py-2 rounded-md cursor-pointer transition-all duration-200 ${
+                    color.selected
+                      ? "bg-[#663399] text-white border-2 border-[#8A2BE2] shadow-[0_0_10px_rgba(138,43,226,0.5)]"
+                      : "bg-[#333333] text-[#C0C0C0] border border-[#444444] hover:bg-[#444444]"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={color.selected}
+                    onChange={() => handleColorToggle(index)}
+                    className="hidden"
+                  />
+                  {color.name}
+                </label>
+              ))}
+            </div>
           </div>
 
           <button

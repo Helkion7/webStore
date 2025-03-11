@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Loader, Music, Skull } from "lucide-react";
+import {
+  Loader,
+  Music,
+  Skull,
+  DollarSign,
+  Star,
+  Ruler,
+  Palette,
+} from "lucide-react";
 
 const LandingPage = () => {
   const [newestProducts, setNewestProducts] = useState([]);
@@ -32,13 +40,18 @@ const LandingPage = () => {
     fetchNewestProducts();
   }, []);
 
+  // Format currency with NOK symbol
+  const formatPrice = (price) => {
+    return `${price} kr`;
+  };
+
   return (
     <div className="bg-[#1E1E1E] text-[#E0E0E0] min-h-screen pb-16">
       {/* Hero Section */}
       <div className="relative bg-gradient-to-b from-[#2D2D2D] to-[#1E1E1E] p-6 mb-12">
         <div className="max-w-6xl mx-auto text-center py-16 relative overflow-hidden">
           <div className="absolute opacity-5 w-full h-full top-0 left-0 z-0">
-            {/* Background guitar silhouette SVG would go here */}
+            {/* Background guitar silhouette SVG */}
             <svg viewBox="0 0 24 24" className="w-full h-full">
               <path
                 fill="currentColor"
@@ -61,14 +74,23 @@ const LandingPage = () => {
           <Music className="text-[#8A2BE2] mr-2" size={24} />
           <h2 className="text-2xl font-bold text-[#9370DB]">Kategorier</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((category) => (
             <Link
               key={category.id}
               to={`/${category.id}`}
               className="bg-[#2D2D2D] rounded-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] border border-[#333333] hover:border-[#8A2BE2] hover:shadow-[0_0_15px_rgba(138,43,226,0.3)] block"
             >
-              <div className="p-6">
+              <div className="p-6 relative overflow-hidden">
+                {/* Guitar pick decoration */}
+                <div className="absolute -right-4 -top-4 text-[#8A2BE2] opacity-10">
+                  <svg width="64" height="64" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M12,8L10.67,8.09C9.81,7.07 7.4,4.5 5,4.5C5,4.5 3.03,7.46 4.96,11.41C4.97,11.43 5.68,13.05 6.87,14.25L12,19.5L17.13,14.25C18.32,13.05 19.03,11.43 19.04,11.41C20.97,7.46 19,4.5 19,4.5C16.6,4.5 14.19,7.07 13.33,8.09L12,8Z"
+                    />
+                  </svg>
+                </div>
                 <h3 className="text-xl font-bold text-[#9370DB] mb-2">
                   {category.name}
                 </h3>
@@ -141,9 +163,61 @@ const LandingPage = () => {
                     <p className="text-[#C0C0C0] text-sm mb-3 line-clamp-2">
                       {product.description}
                     </p>
-                    <span className="inline-block bg-[#333333] text-xs font-semibold py-1 px-2 rounded text-[#9370DB]">
-                      {product.category === "genser" ? "Genser" : "T-skjorte"}
-                    </span>
+                    <div className="flex justify-between items-center">
+                      <span className="inline-block bg-[#333333] text-xs font-semibold py-1 px-2 rounded text-[#9370DB]">
+                        {product.category === "genser" ? "Genser" : "T-skjorte"}
+                      </span>
+                      <div className="flex items-center">
+                        <DollarSign size={14} className="text-[#9370DB] mr-1" />
+                        <span className="font-bold text-[#E0E0E0]">
+                          {formatPrice(product.price)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Display sizes and colors if available */}
+                    {(product.sizes && product.sizes.length > 0) ||
+                    (product.colors && product.colors.length > 0) ? (
+                      <div className="flex flex-wrap gap-2 mt-2 text-xs text-[#C0C0C0]">
+                        {product.sizes && product.sizes.length > 0 && (
+                          <div className="flex items-center">
+                            <Ruler size={12} className="mr-1" />
+                            <span>{product.sizes.join(", ")}</span>
+                          </div>
+                        )}
+
+                        {product.colors && product.colors.length > 0 && (
+                          <div className="flex items-center ml-2">
+                            <Palette size={12} className="mr-1" />
+                            <span>{product.colors.join(", ")}</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : null}
+
+                    {/* Add stock indication and featured badge if applicable */}
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="text-xs">
+                        {product.stock <= 0 ? (
+                          <span className="text-[#8B0000]">Utsolgt</span>
+                        ) : product.stock < 5 ? (
+                          <span className="text-[#8B0000]">Få på lager</span>
+                        ) : (
+                          <span className="text-[#00BFFF]">På lager</span>
+                        )}
+                      </div>
+                      {product.featured && (
+                        <div className="flex items-center text-xs text-[#E0E0E0]">
+                          <Star
+                            size={14}
+                            className="text-[#8A2BE2] mr-1 fill-[#8A2BE2]"
+                          />
+                          <span>Featured</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Remove display of artist for music products since we no longer have music categories */}
                   </div>
                 </div>
               </Link>
